@@ -7,9 +7,18 @@ export default function Home() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleLogin = async () => {
+    if (!username.trim() || !password.trim()) {
+      setMessage("Por favor completa todos los campos.");
+      return;
+    }
+
+    setIsLoading(true);
+    setMessage("");
+
     try {
       const response = await fetch("http://localhost:3000/api/login", {
         method: "POST",
@@ -30,7 +39,9 @@ export default function Home() {
       }
     } catch (error) {
       console.error("Error:", error);
-      setMessage("No se pudo conectar con el servidor.");
+      setMessage("No se pudo conectar con el servidor. Por favor intenta más tarde.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -85,18 +96,19 @@ export default function Home() {
         />
         <button
           onClick={handleLogin}
+          disabled={isLoading}
           style={{
             width: "100%",
             padding: "12px",
-            backgroundColor: "#0070f3",
+            backgroundColor: isLoading ? "#ccc" : "#0070f3",
             color: "#ffffff",
             border: "none",
             borderRadius: "5px",
-            cursor: "pointer",
+            cursor: isLoading ? "not-allowed" : "pointer",
             fontWeight: "bold"
           }}
         >
-          Iniciar Sesión
+          {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
         </button>
 
         {message && (
